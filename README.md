@@ -1,3 +1,4 @@
+
 <html lang="it">
 <head>
   <meta charset="utf-8" />
@@ -182,9 +183,9 @@
 
           <div class="row">
             <div class="col">
-              <label for="phone">Telefono</label>
-              <input id="phone" name="Telefono" type="tel" placeholder="+39 333 1234567" required>
-              <div class="error" id="err-phone">Inserisci un numero di telefono.</div>
+              <label for="phone">Telefono (facoltativo)</label>
+              <input id="phone" name="Telefono" type="tel" placeholder="+39 333 1234567">
+              <div class="error" id="err-phone" style="display:none">Inserisci un numero di telefono valido (se fornito).</div>
             </div>
 
             <div class="col">
@@ -213,22 +214,22 @@
 
           <div class="row">
             <div class="col">
-              <label for="street">Indirizzo (Via / Nr.)</label>
-              <input id="street" name="Via" type="text" placeholder="Via Roma 1" required>
-              <div class="error" id="err-street">Inserisci l'indirizzo.</div>
+              <label for="street">Indirizzo (Via / Nr.) — facoltativo</label>
+              <input id="street" name="Via" type="text" placeholder="Via Roma 1">
+              <div class="error" id="err-street" style="display:none">Inserisci l'indirizzo.</div>
             </div>
             <div class="col">
-              <label for="city">Città</label>
-              <input id="city" name="Città" type="text" placeholder="Milano" required>
-              <div class="error" id="err-city">Inserisci la città.</div>
+              <label for="city">Città — facoltativo</label>
+              <input id="city" name="Città" type="text" placeholder="Milano">
+              <div class="error" id="err-city" style="display:none">Inserisci la città.</div>
             </div>
           </div>
 
           <div class="row" style="align-items:flex-end">
             <div class="col">
-              <label for="zip">CAP</label>
-              <input id="zip" name="CAP" type="text" placeholder="20100" required>
-              <div class="error" id="err-zip">Inserisci il CAP.</div>
+              <label for="zip">CAP — facoltativo</label>
+              <input id="zip" name="CAP" type="text" placeholder="20100">
+              <div class="error" id="err-zip" style="display:none">Inserisci il CAP.</div>
             </div>
 
             <div class="col">
@@ -416,7 +417,8 @@
       const confirmBtn = document.getElementById('confirmBtn');
       const hiddenColors = document.getElementById('hiddenColors');
 
-      function isEmailValid(v){ return /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(v); }
+      const emailEl = document.getElementById('email');
+
       function showError(id, show){ document.getElementById(id).style.display = show ? 'block' : 'none'; }
 
       function collectColors() {
@@ -433,21 +435,20 @@
       function validateAll(){
         let ok = true;
         const name = document.getElementById('name').value.trim();
-        const email = document.getElementById('email').value.trim();
+        const email = emailEl.value.trim();
         const phone = document.getElementById('phone').value.trim();
-        const street = document.getElementById('street').value.trim();
-        const city = document.getElementById('city').value.trim();
-        const zip = document.getElementById('zip').value.trim();
-        const country = document.getElementById('country').value.trim();
         const message = document.getElementById('message').value.trim();
         const colors = collectColors();
 
+        // required checks
         showError('err-name', !name); if(!name) ok=false;
-        showError('err-email', !isEmailValid(email)); if(!isEmailValid(email)) ok=false;
-        showError('err-phone', !phone); if(!phone) ok=false;
-        showError('err-street', !street); if(!street) ok=false;
-        showError('err-city', !city); if(!city) ok=false;
-        showError('err-zip', !zip); if(!zip) ok=false;
+
+        // use HTML5 validation for email (more permissive / standard)
+        if(!emailEl.checkValidity()){ showError('err-email', true); ok=false; } else { showError('err-email', false); }
+
+        // phone is OPTIONAL: if provided, do a minimal length check
+        if(phone && phone.length < 5){ showError('err-phone', true); ok=false; } else { showError('err-phone', false); }
+
         showError('err-message', !message); if(!message) ok=false;
 
         if(colors.length === 0) { errColors.style.display = 'block'; ok=false; } else { errColors.style.display = 'none'; }
@@ -459,11 +460,11 @@
         summary.innerHTML = '';
         const fields = [
           ['Nome', document.getElementById('name').value.trim()],
-          ['Email', document.getElementById('email').value.trim()],
-          ['Telefono', document.getElementById('phone').value.trim()],
+          ['Email', emailEl.value.trim()],
+          ['Telefono', document.getElementById('phone').value.trim() || '-'],
           ['Quantità', document.getElementById('qty').value.trim()],
           ['Paese', document.getElementById('country').value.trim()],
-          ['Indirizzo', `${document.getElementById('street').value.trim()}, ${document.getElementById('city').value.trim()} (${document.getElementById('zip').value.trim()})`],
+          ['Indirizzo', `${document.getElementById('street').value.trim() || '-'}, ${document.getElementById('city').value.trim() || '-'} (${document.getElementById('zip').value.trim() || '-'})`],
           ['Dettagli', document.getElementById('message').value.trim()]
         ];
         fields.forEach(([k,v])=>{
