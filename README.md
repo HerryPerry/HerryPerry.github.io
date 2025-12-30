@@ -1,5 +1,3 @@
-
-[index_Version5.html](https://github.com/user-attachments/files/24388481/index_Version5.html)
 <!doctype html>
 <html lang="it">
 <head>
